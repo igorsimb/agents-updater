@@ -95,7 +95,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
   colors like `bg-white` and prefer `bg-body`, `text-body`, `*-subtle`).
 - Keep user-facing UI text in Russian unless explicitly asked otherwise.
 
-### Django Conventions
+### Django Conventions (for django-based apps)
 - Keep settings in `config/settings.py`.
 - Keep URL routing in `config/urls.py` or per-app `urls.py`.
 - Prefer class-based views for reusable logic.
@@ -107,11 +107,6 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - Keep base configuration in settings; override per environment via env vars.
 - Avoid importing settings in models to prevent app loading cycles.
 - Keep database config in `DATABASES` with explicit keys.
-
-### Apps and Layout
-- Add new apps with `python manage.py startapp app_name`.
-- Keep app-specific URLs in `app_name/urls.py` and include them.
-- Keep templates under `app_name/templates/app_name/`.
 
 ## Commit Messages
 
