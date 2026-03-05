@@ -1,7 +1,10 @@
 [project]
 name = "agents-updater"
 version = "0.1.0"
-description = "Add your description here"
+description = "CLI tool to update AGENTS.md from a central repository"
+license = { text = "MIT" }
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = []
+requires-python = ">=3.9"
+
+[project.scripts]
+agents-update = "agents_updater:main"
