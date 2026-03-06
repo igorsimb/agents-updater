@@ -104,9 +104,9 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ### Configuration
 - Read environment variables with `os.environ` or `os.getenv`.
-- Keep base configuration in settings; override per environment via env vars.
-- Avoid importing settings in models to prevent app loading cycles.
-- Keep database config in `DATABASES` with explicit keys.
+- Keep base configuration in settings; override per environment via env vars (for django-based apps).
+- Avoid importing settings in models to prevent app loading cycles (for django-based apps).
+- Keep database config in `DATABASES` with explicit keys (for django-based apps).
 
 ## Commit Messages
 
