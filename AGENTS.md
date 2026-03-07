@@ -1,13 +1,14 @@
 ## Highest Priority Formatting Rule (Overrides Other Style Preferences)
 
+- The soft line limit is 120 characters.
 - Do not reflow or rewrap existing lines that are <= 120 characters.
 - Only wrap when a line exceeds 120 characters.
 - If multiple formatting rules conflict, preserve existing wrapping and apply minimal edits.
-- Do not introduce extra line breaks for readability/style if line length is <= 120.
+- Do not introduce extra line breaks for readability/style if a line fits within 120 characters.
 - Keep `if` conditions in one line when they fit within 120 characters.
 - Avoid multi-line walrus layouts unless the single-line variant exceeds 120 characters.
 - Prefer readable alternatives over wrapped walrus forms (assign first, then `if`) when that keeps lines <= 120.
-- Keep function signature in one line if possible, e.g. 
+- Keep function signatures in one line when they fit within 120 characters, e.g.
 `def validate_sql(query: str, tool_runtime: ToolRuntime) -> Command | dict[str, object]:`
 
 Examples:
@@ -27,15 +28,38 @@ Examples:
 ## Virtual Environment
 - use existing .venv to execute related commands, e.g. `".venv/Scripts/python.exe" -m pytest`
 
+## Output Contract
+
+- Return exactly the sections or artifact the user requested.
+- Keep responses concise, information-dense, and free of repeated restatement.
+- Do not treat plans, scratch reasoning, or progress updates as part of the final answer.
+- If the user requests a strict format, output only that format.
+
+## Instruction Priority and Task Updates
+
+- User instructions override default style, tone, formatting, and initiative preferences.
+- Safety, honesty, privacy, and permission constraints do not yield.
+- If a newer user instruction conflicts with an earlier one, follow the newer instruction.
+- Preserve earlier instructions that do not conflict.
+- If the task changes mid-conversation, state what changed and apply the new scope to the next work.
+
+## Missing Context Gating
+
+- If required context is missing, do not guess.
+- First try to retrieve missing context from the repo, available tools, or prior conversation state.
+- Ask one focused clarifying question only when the missing fact cannot be retrieved.
+- If you must proceed before resolution, state the assumption explicitly and choose the most reversible path.
+
 ## 1. Think Before Coding
 
 **Don't assume. Don't hide confusion. Surface tradeoffs.**
 
 Before implementing:
-- State your assumptions explicitly. If uncertain, ask.
+- State your assumptions explicitly.
 - If multiple interpretations exist, present them - don't pick silently.
 - If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
+- If something is unclear, stop. Name what's confusing.
+- If uncertainty remains after checking available context, ask.
 
 ## 2. Simplicity First
 
@@ -74,7 +98,7 @@ Transform tasks into verifiable goals:
 - "Fix the bug" → "Write a test that reproduces it, then make it pass"
 - "Refactor X" → "Ensure tests pass before and after"
 
-For multi-step tasks, state a brief plan:
+For substantial multi-step tasks, state a brief plan:
 ```
 1. [Step] → verify: [check]
 2. [Step] → verify: [check]
@@ -83,12 +107,28 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
-## Code Style Guidelines
+## 5. Tool Persistence and Dependency Checks
 
-### Line Length
-- Prefer a soft line limit of **120 characters**.
-- If a line fits within 120 characters, do not wrap it just to create extra line breaks.
-- If a line exceeds 120 characters, wrap it sensibly (especially in Markdown lists, long function calls, and long strings).
+**Use tools until the task is complete and verified. Do prerequisites before dependent actions.**
+
+- Use tools whenever they materially improve correctness, completeness, or grounding.
+- Do not stop at analysis if the user asked for implementation, fixes, or verification.
+- Before taking an action, check whether discovery, lookup, repro, or test setup is required.
+- Do not skip prerequisite steps just because the final action seems obvious.
+- If a search, lookup, or tool call returns empty or suspiciously narrow results, retry with at least one fallback strategy before concluding.
+- When independent retrieval steps exist, prefer parallel tool calls; when steps depend on each other, keep them sequential.
+
+## 6. Completion and Verification
+
+**Do not declare success until all requested work is done, verified, or explicitly blocked.**
+
+- Treat the task as incomplete until every requested deliverable is completed or marked `[blocked]` with the exact missing dependency.
+- Keep track of requested items for batches, lists, multi-file edits, and multi-step workflows.
+- Before finalizing, verify requirements coverage, grounding in repo/tool output, and requested formatting.
+- Before irreversible or high-impact actions, verify inputs and ask when permission is required.
+- After code changes, run the lightest meaningful verification available unless the user explicitly asked not to.
+
+## Code Style Guidelines
 
 ### Frontend
 - Use Bootstrap utility classes that are dark/light theme aware (avoid fixed
