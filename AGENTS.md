@@ -81,10 +81,22 @@ For multi-step tasks, state a brief plan:
 3. [Step] → verify: [check]
 ```
 
-When planning larger changes:
+**When planning larger changes:**
 - Prefer phased plans over one-shot plans.
 - Make each phase small, concrete, and independently verifiable.
+- Write the plan to `docs/plans/<name_of_file>.md`.
+- For larger or multi-session tasks, maintain `docs/plans/progress.md` with completed work,
+  next steps, blockers, and verification status.
+- When resuming work, read `docs/plans/<name_of_file>.md`, `docs/plans/progress.md`, and recent git
+  history before making changes.
 - Stop after each phase when the user wants explicit review/approval before continuing.
+- After implementing a phase, send the phase for review if a reviewer subagent is available.
+- Apply the review feedback, re-verify, and only then move to the next phase.
+- Follow a tight loop: plan from the task spec, build with verification in mind, verify
+  by running relevant tests and reading the full output, then fix against the original spec.
+- Do not treat re-reading your own code as verification; compare the result against what
+  was asked.
+- Once the task is complete, ask the user before deleting `docs/plans/progress.md`.
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
