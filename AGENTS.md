@@ -32,6 +32,10 @@ Examples:
 **Don't assume. Don't hide confusion. Surface tradeoffs.**
 
 Before implementing:
+- State how you will verify the change before writing code (test command, browser check, script, etc.).
+- Write the verification step first when possible (for example, the failing test for a bug fix).
+- Implement only after the verification step exists.
+- Run verification, read the full result, and keep iterating until it passes.
 - State your assumptions explicitly. If uncertain, ask.
 - If multiple interpretations exist, present them - don't pick silently.
 - If a simpler approach exists, say so. Push back when warranted.
@@ -85,11 +89,13 @@ For multi-step tasks, state a brief plan:
 - Prefer phased plans over one-shot plans.
 - Make each phase small, concrete, and independently verifiable.
 - Write the plan to `docs/plans/<name_of_file>.md`.
+- After writing the plan, stop and wait for explicit user approval.
 - For larger or multi-session tasks, maintain `docs/plans/progress.md` with completed work,
   next steps, blockers, and verification status.
 - When resuming work, read `docs/plans/<name_of_file>.md`, `docs/plans/progress.md`, and recent git
   history before making changes.
-- Stop after each phase when the user wants explicit review/approval before continuing.
+- After approval, implement one phase at a time.
+- After each phase, stop and wait for user review/approval unless the user explicitly says not to.
 - After implementing a phase, send the phase for review if a reviewer subagent is available.
 - Apply the review feedback, re-verify, and only then move to the next phase.
 - Follow a tight loop: plan from the task spec, build with verification in mind, verify
@@ -106,11 +112,6 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - Prefer a soft line limit of **120 characters**.
 - If a line fits within 120 characters, do not wrap it just to create extra line breaks.
 - If a line exceeds 120 characters, wrap it sensibly (especially in Markdown lists, long function calls, and long strings).
-
-### Frontend
-- Use Bootstrap utility classes that are dark/light theme aware (avoid fixed
-  colors like `bg-white` and prefer `bg-body`, `text-body`, `*-subtle`).
-- Keep user-facing UI text in Russian unless explicitly asked otherwise.
 
 ### Django Conventions (for django-based apps)
 - Keep settings in `config/settings.py`.
