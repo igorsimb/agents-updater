@@ -23,6 +23,12 @@ Examples:
       := check_allowlist(table_name_normalization_error)
   ):
   ```
+  
+### Edit Method Selection
+- For small changes in existing files, prefer `apply_patch`.
+- If `apply_patch` causes broad formatting churn, restore the file and use exact text replacement for the narrow block instead.
+- Do not use a whole-file rewrite for a local change unless the user explicitly asked for a rewrite.
+
 
 ## Virtual Environment
 - use existing .venv to execute related commands, e.g. `".venv/Scripts/python.exe" -m pytest`
@@ -112,6 +118,14 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - Prefer a soft line limit of **120 characters**.
 - If a line fits within 120 characters, do not wrap it just to create extra line breaks.
 - If a line exceeds 120 characters, wrap it sensibly (especially in Markdown lists, long function calls, and long strings).
+
+### Minimal Diff Rule
+- For small edits, prefer a surgical patch or exact string replacement over whole-file rewrites.
+- If a change can be expressed in one small hunk, do only that.
+- Do not change single quotes to double quotes, collapse or expand wrapping, or reorder imports unless the user explicitly requested formatting cleanup.
+- Before finishing any edit to an existing file, inspect `git diff -- <file>`.
+- If the diff shows unrelated formatting or style churn, revert that file and re-apply the change more surgically.
+
 
 ### Django Conventions (for django-based apps)
 - Keep settings in `config/settings.py`.
