@@ -9,6 +9,14 @@ from urllib.request import urlopen
 SOURCE_URL = "https://raw.githubusercontent.com/igorsimb/agents-updater/main/AGENTS.md"
 
 
+def get_global_agents_path() -> Path:
+    return Path.home() / ".config" / "opencode" / "AGENTS.md"
+
+
+def format_agents_path(path: Path) -> str:
+    return str(path)
+
+
 def fetch_remote_agents() -> str:
     try:
         with urlopen(SOURCE_URL, timeout=15) as response:
@@ -23,14 +31,16 @@ def fetch_remote_agents() -> str:
 
 
 def update_agents_file() -> None:
-    local_path = Path.cwd() / "AGENTS.md"
+    local_path = get_global_agents_path()
+    local_path.parent.mkdir(parents=True, exist_ok=True)
     remote_content = fetch_remote_agents()
     local_content = (
         local_path.read_text(encoding="utf-8") if local_path.exists() else None
     )
+    display_path = format_agents_path(local_path)
 
     if local_content == remote_content:
-        print("AGENTS.md already up to date")
+        print(f"AGENTS.md already up to date: {display_path}")
         return
 
     tmp_file: Path | None = None
@@ -50,7 +60,7 @@ def update_agents_file() -> None:
         if tmp_file is not None and tmp_file.exists():
             tmp_file.unlink()
 
-    print("AGENTS.md updated")
+    print(f"AGENTS.md updated: {display_path}")
 
 
 def main() -> None:
