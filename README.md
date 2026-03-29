@@ -25,6 +25,20 @@ Install using uv:
 uv pip install git+https://github.com/igorsimb/agents-updater
 ```
 
+## Uninstalling
+
+Uninstall with pip:
+
+```bash
+pip uninstall agents-updater
+```
+
+Uninstall using uv:
+
+```bash
+uv pip uninstall agents-updater
+```
+
 ## Usage
 
 From anywhere:
