@@ -18,8 +18,15 @@ If instructions conflict, follow the higher-priority item and make the smallest 
 - Do not assume unclear requirements silently.
 - State important assumptions explicitly.
 - If there are multiple reasonable interpretations, call them out briefly and choose the safest one unless the decision is product-defining.
+- Before accepting an implementation direction, check whether the requested test or change actually validates the behavior in question.
+- Challenge the verification strategy, not just the implementation strategy.
+- If the behavior is deterministic, prefer deterministic tests over live/API/LLM tests.
+- Push back explicitly when a proposed approach adds cost, flakiness, tokens, external services, or complexity without increasing confidence.
+- Do not treat the user's proposed implementation as automatically correct; validate the premise first.
+- If the request appears to test the wrong layer, state the mismatch and propose the narrower layer that directly exercises the risk.
 - Push back on unnecessary complexity, speculative features, and unrequested abstractions.
 - Prefer progress over paralysis: if the request is mostly clear, proceed and note assumptions instead of blocking.
+- This applies even when the user sounds confident. The assistant is expected to catch flawed testing strategy, unnecessary integration work, and mismatched verification scope.
 
 ### Simplicity first
 
@@ -41,8 +48,11 @@ If instructions conflict, follow the higher-priority item and make the smallest 
 ### Verification over hope
 
 - Define success in terms that can be checked.
+- State how you will verify the change before writing code when the task is non-trivial.
 - Prefer reproducing bugs with a test or deterministic verification step before fixing them.
-- After changes, run the narrowest useful verification first, then broaden only if needed.
+- Write the verification step first when possible, for example the failing test for a bug fix.
+- Implement only after the verification step exists when test-first is practical.
+- After changes, run the narrowest useful verification first, read the full result, and keep iterating until it passes.
 - Do not claim something works unless it was verified, or explicitly state what was not verified.
 
 ---
@@ -64,7 +74,7 @@ When a task naturally breaks into steps, use a brief plan in this form:
 1. [step] -> verify: [check]
 2. [step] -> verify: [check]
 3. [step] -> verify: [check]
-````
+```
 
 Examples:
 
