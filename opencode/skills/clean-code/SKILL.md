@@ -1,92 +1,42 @@
 ---
 name: clean-code
-description: "This skill embodies the principles of \"Clean Code\" by Robert C. Martin (Uncle Bob). Use it to transform \"code that works\" into \"code that is clean.\""
-risk: safe
+description: Use when refactoring, reviewing, or improving code quality. Focus on clear, maintainable code without
+  changing required behavior.
 ---
 
-# Clean Code Skill
+# Clean Code
 
-This skill embodies the principles of "Clean Code" by Robert C. Martin (Uncle Bob). Use it to transform "code that works" into "code that is clean."
+Use this skill to resolve concrete readability, maintainability, or design problems in existing code. Preserve required
+behavior and follow the repository's established conventions.
 
-## 🧠 Core Philosophy
-> "Code is clean if it can be read, and enhanced by a developer other than its original author." — Grady Booch
+## Approach
 
-## When to Use
-Use this skill when:
-- **Writing new code**: To ensure high quality from the start.
-- **Reviewing Pull Requests**: To provide constructive, principle-based feedback.
-- **Refactoring legacy code**: To identify and remove code smells.
-- **Improving team standards**: To align on industry-standard best practices.
+- Inspect the relevant code and tests before proposing or making a change.
+- Make the smallest change that resolves the identified problem. Do not refactor adjacent code without a concrete
+  benefit.
+- Prefer clear names, straightforward control flow, and local code over cleverness or speculative abstractions.
+- Preserve the existing public API unless the task explicitly changes it.
+- Treat principles as heuristics, not quotas. Avoid arbitrary limits on lines, parameters, functions, or classes.
 
-## 1. Meaningful Names
-- **Use Intention-Revealing Names**: `elapsedTimeInDays` instead of `d`.
-- **Avoid Disinformation**: Don't use `accountList` if it's actually a `Map`.
-- **Make Meaningful Distinctions**: Avoid `ProductData` vs `ProductInfo`.
-- **Use Pronounceable/Searchable Names**: Avoid `genymdhms`.
-- **Class Names**: Use nouns (`Customer`, `WikiPage`). Avoid `Manager`, `Data`.
-- **Method Names**: Use verbs (`postPayment`, `deletePage`).
+## Code Quality Heuristics
 
-## 2. Functions
-- **Small!**: Functions should be shorter than you think.
-- **Do One Thing**: A function should do only one thing, and do it well.
-- **One Level of Abstraction**: Don't mix high-level business logic with low-level details (like regex).
-- **Descriptive Names**: `isPasswordValid` is better than `check`.
-- **Arguments**: 0 is ideal, 1-2 is okay, 3+ requires a very strong justification.
-- **No Side Effects**: Functions shouldn't secretly change global state.
+- Choose names that reveal purpose and distinguish concepts clearly.
+- Keep each function or class focused on one coherent responsibility.
+- Keep related behavior together; extract a helper only when it removes real duplication or clarifies a meaningful
+  concept.
+- Keep abstractions at a consistent level. Do not introduce interfaces, patterns, or layers without a present need.
+- Avoid hidden side effects. Make state changes, mutation, and I/O apparent at the appropriate boundary.
+- Prefer explicit error handling with useful context over error codes, broad catches, or silent failures.
+- Use comments for non-obvious intent, constraints, or tradeoffs. Improve code instead of commenting on obvious
+  mechanics.
 
-## 3. Comments
-- **Don't Comment Bad Code—Rewrite It**: Most comments are a sign of failure to express ourselves in code.
-- **Explain Yourself in Code**: 
-  ```python
-  # Check if employee is eligible for full benefits
-  if employee.flags & HOURLY and employee.age > 65:
-  ```
-  vs
-  ```python
-  if employee.isEligibleForFullBenefits():
-  ```
-- **Good Comments**: Legal, Informative (regex intent), Clarification (external libraries), TODOs.
-- **Bad Comments**: Mumbling, Redundant, Misleading, Mandated, Noise, Position Markers.
+## Verification
 
-## 4. Formatting
-- **The Newspaper Metaphor**: High-level concepts at the top, details at the bottom.
-- **Vertical Density**: Related lines should be close to each other.
-- **Distance**: Variables should be declared near their usage.
-- **Indentation**: Essential for structural readability.
+- Test the main observable behavior and changed edge cases, not implementation details or incidental formatting.
+- Preserve and extend focused regression coverage when it directly protects the change.
+- Run the narrowest relevant verification and report material gaps.
 
-## 5. Objects and Data Structures
-- **Data Abstraction**: Hide the implementation behind interfaces.
-- **The Law of Demeter**: A module should not know about the innards of the objects it manipulates. Avoid `a.getB().getC().doSomething()`.
-- **Data Transfer Objects (DTO)**: Classes with public variables and no functions.
+## Review Output
 
-## 6. Error Handling
-- **Use Exceptions instead of Return Codes**: Keeps logic clean.
-- **Write Try-Catch-Finally First**: Defines the scope of the operation.
-- **Don't Return Null**: It forces the caller to check for null every time.
-- **Don't Pass Null**: Leads to `NullPointerException`.
-
-## 7. Unit Tests
-- **The Three Laws of TDD**:
-  1. Don't write production code until you have a failing unit test.
-  2. Don't write more of a unit test than is sufficient to fail.
-  3. Don't write more production code than is sufficient to pass the failing test.
-- **F.I.R.S.T. Principles**: Fast, Independent, Repeatable, Self-Validating, Timely.
-
-## 8. Classes
-- **Small!**: Classes should have a single responsibility (SRP).
-- **The Stepdown Rule**: We want the code to read like a top-down narrative.
-
-## 9. Smells and Heuristics
-- **Rigidity**: Hard to change.
-- **Fragility**: Breaks in many places.
-- **Immobility**: Hard to reuse.
-- **Viscosity**: Hard to do the right thing.
-- **Needless Complexity/Repetition**.
-
-## 🛠️ Implementation Checklist
-- [ ] Is this function smaller than 20 lines?
-- [ ] Does this function do exactly one thing?
-- [ ] Are all names searchable and intention-revealing?
-- [ ] Have I avoided comments by making the code clearer?
-- [ ] Am I passing too many arguments?
-- [ ] Is there a failing test for this change?
+Lead with the most important finding or completed improvement. Include the evidence needed to support it, material
+caveats, and the next action. Omit generic introductions, repeated guidance, and optional background.
