@@ -1,15 +1,27 @@
 # agents-updater
 
-Small dependency-free CLI tool that keeps your global OpenCode `AGENTS.md` file synchronized with a canonical version stored in GitHub.
+Small dependency-free CLI tool that keeps your global OpenCode configuration synchronized with canonical content stored in
+GitHub.
 
 ## What it does
 
-Run `agents-update` to:
+Run `agents-update` to update all managed OpenCode content:
 
 - download the canonical `AGENTS.md`
-- compare it with `~/.config/opencode/AGENTS.md`
-- create or overwrite the global file only when content differs
-- print whether it was updated or already up to date
+- download the canonical `agents/` and `skills/` directories
+- compare each file with its global counterpart
+- create or overwrite files only when content differs
+- preserve global agents and skills that are not managed by this repository
+- print per-file results and a summary
+
+The canonical payload lives in this repository's `opencode/` directory:
+
+```text
+opencode/
+  AGENTS.md
+  agents/
+  skills/
+```
 
 ## Installation
 
@@ -47,10 +59,26 @@ From anywhere:
 agents-update
 ```
 
-The command downloads the canonical `AGENTS.md`, updates `~/.config/opencode/AGENTS.md` if needed, and prints either:
+The command updates all of the following by default:
 
-- `AGENTS.md updated`
-- `AGENTS.md already up to date`
+- `~/.config/opencode/AGENTS.md`
+- `~/.config/opencode/agents/`
+- `~/.config/opencode/skills/`
+
+Select one or more targets when needed:
+
+```bash
+agents-update --agents-md
+agents-update --agents
+agents-update --skills
+agents-update --agents --skills
+agents-update --all
+```
+
+`--all` is equivalent to running `agents-update` with no scope flags. It cannot be combined with a specific scope flag.
+
+The update is additive: files managed by this repository are updated, but global agents and skills not present in this
+repository are not deleted.
 
 ## FAQ
 

@@ -1,10 +1,18 @@
 [project]
 name = "agents-updater"
-version = "0.1.1"
-description = "CLI tool to update AGENTS.md from a central repository"
+version = "0.2.0"
+description = "CLI tool to update global OpenCode instructions, agents, and skills"
 license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.9"
 
 [project.scripts]
 agents-update = "agents_updater:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

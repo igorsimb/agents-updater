@@ -1,4 +1,4 @@
-# Repository Agent Instructions
+# Global OpenCode Instructions
 
 ## Priorities And Scope
 
