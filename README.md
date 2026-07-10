@@ -31,6 +31,12 @@ Install with pip directly from GitHub:
 pip install git+https://github.com/igorsimb/agents-updater
 ```
 
+Upgrade an existing installation with pip:
+
+```bash
+pip install --upgrade git+https://github.com/igorsimb/agents-updater
+```
+
 Install using uv:
 
 ```bash

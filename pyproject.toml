@@ -1,13 +1,20 @@
 [project]
 name = "agents-updater"
-version = "0.2.0"
+version = "0.2.1"
 description = "CLI tool to update global OpenCode instructions, agents, and skills"
-license = { text = "MIT" }
+license = "MIT"
 readme = "README.md"
 requires-python = ">=3.9"
 
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
 [project.scripts]
 agents-update = "agents_updater:main"
+
+[tool.setuptools]
+py-modules = ["agents_updater"]
 
 [dependency-groups]
 dev = [
