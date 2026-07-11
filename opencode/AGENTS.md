@@ -30,6 +30,8 @@ unrelated worktree changes.
 - Inspect the relevant code path and local conventions before changing code.
 - Make the smallest change that meets the requested outcome. Do not add unrequested features, abstractions,
   configuration, or unrelated refactors.
+- When making technical decisions, do not give much weight to development cost. Instead, prefer quality, simplicity,
+  robustness, scalability, and long-term maintainability.
 - Preserve public behavior unless the request changes it.
 - Prefer deterministic, focused tests over live, API, or LLM tests when they cover the risk.
 - Validate the requested behavior at the narrowest useful layer, then broaden checks only when risk warrants it.
