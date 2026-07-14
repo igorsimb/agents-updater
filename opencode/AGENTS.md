@@ -47,6 +47,7 @@ create a plan for straightforward edits.
 - Remove code, imports, variables, tests, or comments made unused by the change. Leave unrelated dead code untouched.
 - Comment only to explain non-obvious intent, constraints, or tradeoffs.
 - Do not reflow existing lines at or under 120 characters. Prefer a soft 120-character limit for new or changed lines.
+- Never use em dashes; always use regular hyphens (`-`) instead.
 
 ## Testing And Commands
 
