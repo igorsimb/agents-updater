@@ -12,13 +12,31 @@ import agents_updater
 
 
 class ParseArgsTests(unittest.TestCase):
-    def test_defaults_to_all_scopes(self) -> None:
-        self.assertEqual(agents_updater.parse_args([]), agents_updater.ALL_SCOPES)
+    def test_defaults_to_all_scopes_and_platforms(self) -> None:
+        self.assertEqual(agents_updater.parse_args([]), (agents_updater.ALL_SCOPES, agents_updater.ALL_PLATFORMS))
 
-    def test_selects_requested_scopes(self) -> None:
+    def test_selects_requested_scopes_for_all_platforms(self) -> None:
         self.assertEqual(
             agents_updater.parse_args(["--agents", "--skills"]),
-            frozenset((agents_updater.AGENTS, agents_updater.SKILLS)),
+            (frozenset((agents_updater.AGENTS, agents_updater.SKILLS)), agents_updater.ALL_PLATFORMS),
+        )
+
+    def test_selects_requested_platform_with_all_scopes(self) -> None:
+        self.assertEqual(
+            agents_updater.parse_args(["--codex"]),
+            (agents_updater.ALL_SCOPES, frozenset((agents_updater.CODEX,))),
+        )
+
+    def test_combines_platform_and_scope_filters(self) -> None:
+        self.assertEqual(
+            agents_updater.parse_args(["--opencode", "--skills"]),
+            (frozenset((agents_updater.SKILLS,)), frozenset((agents_updater.OPENCODE,))),
+        )
+
+    def test_combines_all_scopes_with_platform_filter(self) -> None:
+        self.assertEqual(
+            agents_updater.parse_args(["--codex", "--all"]),
+            (agents_updater.ALL_SCOPES, frozenset((agents_updater.CODEX,))),
         )
 
     def test_rejects_all_with_specific_scope(self) -> None:
@@ -33,42 +51,50 @@ class UpdateSelectedScopesTests(unittest.TestCase):
             "tree": [
                 {"type": "blob", "path": "opencode/agents/tester.md"},
                 {"type": "blob", "path": "opencode/skills/clean-code/SKILL.md"},
+                {"type": "blob", "path": "codex/agents/tester.toml"},
+                {"type": "blob", "path": "codex/skills/clean-code/SKILL.md"},
                 {"type": "blob", "path": "README.md"},
             ]
         }
         with patch.object(agents_updater, "fetch_url", return_value=json.dumps(manifest)):
-            paths = agents_updater.fetch_directory_files(frozenset((agents_updater.AGENTS,)))
+            paths = agents_updater.fetch_directory_files(
+                frozenset((agents_updater.AGENTS,)), frozenset((agents_updater.CODEX,))
+            )
 
-        self.assertEqual(paths, [PurePosixPath("opencode", "agents", "tester.md")])
+        self.assertEqual(paths, [PurePosixPath("codex", "agents", "tester.toml")])
 
-    def test_updates_selected_files_in_global_opencode_directory(self) -> None:
+    def test_updates_selected_files_in_platform_directories(self) -> None:
         source_paths = [
             PurePosixPath("opencode", "AGENTS.md"),
-            PurePosixPath("opencode", "agents", "tester.md"),
             PurePosixPath("opencode", "skills", "clean-code", "SKILL.md"),
+            PurePosixPath("codex", "AGENTS.md"),
+            PurePosixPath("codex", "agents", "tester.toml"),
         ]
 
         with tempfile.TemporaryDirectory() as directory:
-            global_path = Path(directory)
+            opencode_path = Path(directory) / "opencode"
+            codex_path = Path(directory) / "codex"
             with (
                 patch.object(agents_updater, "get_source_files", return_value=source_paths),
                 patch.object(
                     agents_updater,
                     "fetch_remote_file",
-                    side_effect=("instructions", "agent", "skill"),
+                    side_effect=("opencode instructions", "skill", "codex instructions", "agent"),
                 ),
-                patch.object(agents_updater, "get_global_opencode_path", return_value=global_path),
+                patch.object(agents_updater, "get_global_opencode_path", return_value=opencode_path),
+                patch.object(agents_updater, "get_global_codex_path", return_value=codex_path),
             ):
                 output = io.StringIO()
                 with redirect_stdout(output):
-                    agents_updater.update_selected_scopes(agents_updater.ALL_SCOPES)
+                    agents_updater.update_selected_scopes(agents_updater.ALL_SCOPES, agents_updater.ALL_PLATFORMS)
 
-            self.assertEqual((global_path / "AGENTS.md").read_text(encoding="utf-8"), "instructions")
-            self.assertEqual((global_path / "agents" / "tester.md").read_text(encoding="utf-8"), "agent")
+            self.assertEqual((opencode_path / "AGENTS.md").read_text(encoding="utf-8"), "opencode instructions")
             self.assertEqual(
-                (global_path / "skills" / "clean-code" / "SKILL.md").read_text(encoding="utf-8"), "skill"
+                (opencode_path / "skills" / "clean-code" / "SKILL.md").read_text(encoding="utf-8"), "skill"
             )
-            self.assertIn("Summary: 3 updated, 0 already up to date.", output.getvalue())
+            self.assertEqual((codex_path / "AGENTS.md").read_text(encoding="utf-8"), "codex instructions")
+            self.assertEqual((codex_path / "agents" / "tester.toml").read_text(encoding="utf-8"), "agent")
+            self.assertIn("Summary: 4 updated, 0 already up to date.", output.getvalue())
 
     def test_download_failure_does_not_update_any_file(self) -> None:
         source_paths = [
@@ -90,7 +116,9 @@ class UpdateSelectedScopesTests(unittest.TestCase):
                 patch.object(agents_updater, "get_global_opencode_path", return_value=global_path),
             ):
                 with self.assertRaisesRegex(RuntimeError, "download failed"):
-                    agents_updater.update_selected_scopes(agents_updater.ALL_SCOPES)
+                    agents_updater.update_selected_scopes(
+                        agents_updater.ALL_SCOPES, frozenset((agents_updater.OPENCODE,))
+                    )
 
             self.assertEqual(agents_path.read_text(encoding="utf-8"), "existing instructions")
 

@@ -1,7 +1,7 @@
 [project]
 name = "agents-updater"
-version = "0.2.1"
-description = "CLI tool to update global OpenCode instructions, agents, and skills"
+version = "0.3.0"
+description = "CLI tool to update global OpenCode and Codex instructions, agents, and skills"
 license = "MIT"
 readme = "README.md"
 requires-python = ">=3.9"

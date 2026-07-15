@@ -11,7 +11,9 @@ from urllib.request import urlopen
 REPOSITORY_URL = "https://github.com/igorsimb/agents-updater"
 RAW_SOURCE_URL = "https://raw.githubusercontent.com/igorsimb/agents-updater/main"
 TREE_SOURCE_URL = "https://api.github.com/repos/igorsimb/agents-updater/git/trees/main?recursive=1"
-PAYLOAD_DIRECTORY = "opencode"
+OPENCODE = "opencode"
+CODEX = "codex"
+ALL_PLATFORMS = frozenset((OPENCODE, CODEX))
 AGENTS_MD = "agents_md"
 AGENTS = "agents"
 SKILLS = "skills"
@@ -21,6 +23,10 @@ DIRECTORY_SCOPES = frozenset((AGENTS, SKILLS))
 
 def get_global_opencode_path() -> Path:
     return Path.home() / ".config" / "opencode"
+
+
+def get_global_codex_path() -> Path:
+    return Path.home() / ".codex"
 
 
 def fetch_url(url: str, description: str) -> str:
@@ -40,7 +46,7 @@ def fetch_remote_file(source_path: str) -> str:
     return fetch_url(f"{RAW_SOURCE_URL}/{source_path}", source_path)
 
 
-def fetch_directory_files(scopes: frozenset[str]) -> list[PurePosixPath]:
+def fetch_directory_files(scopes: frozenset[str], platforms: frozenset[str]) -> list[PurePosixPath]:
     if not scopes.intersection(DIRECTORY_SCOPES):
         return []
 
@@ -56,29 +62,36 @@ def fetch_directory_files(scopes: frozenset[str]) -> list[PurePosixPath]:
             continue
 
         path = PurePosixPath(entry["path"])
-        for scope in scopes.intersection(DIRECTORY_SCOPES):
-            scope_path = PurePosixPath(PAYLOAD_DIRECTORY, scope)
-            if scope_path in path.parents:
-                paths.append(path)
-                break
+        for platform in platforms:
+            for scope in scopes.intersection(DIRECTORY_SCOPES):
+                scope_path = PurePosixPath(platform, scope)
+                if scope_path in path.parents:
+                    paths.append(path)
+                    break
 
     return sorted(paths)
 
 
-def get_source_files(scopes: frozenset[str]) -> list[PurePosixPath]:
+def get_source_files(scopes: frozenset[str], platforms: frozenset[str]) -> list[PurePosixPath]:
     paths = []
     if AGENTS_MD in scopes:
-        paths.append(PurePosixPath(PAYLOAD_DIRECTORY, "AGENTS.md"))
-    paths.extend(fetch_directory_files(scopes))
+        paths.extend(PurePosixPath(platform, "AGENTS.md") for platform in sorted(platforms))
+    paths.extend(fetch_directory_files(scopes, platforms))
     return paths
 
 
 def get_destination_path(source_path: PurePosixPath) -> Path:
+    platform = source_path.parts[0] if source_path.parts else None
+    if platform not in ALL_PLATFORMS:
+        raise ValueError(f"invalid source path: {source_path}")
+
     try:
-        relative_path = source_path.relative_to(PAYLOAD_DIRECTORY)
+        relative_path = source_path.relative_to(platform)
     except ValueError as exc:
         raise ValueError(f"invalid source path: {source_path}") from exc
-    return get_global_opencode_path().joinpath(*relative_path.parts)
+
+    global_path = get_global_opencode_path() if platform == OPENCODE else get_global_codex_path()
+    return global_path.joinpath(*relative_path.parts)
 
 
 def update_file(local_path: Path, remote_content: str, label: str) -> bool:
@@ -110,8 +123,8 @@ def update_file(local_path: Path, remote_content: str, label: str) -> bool:
     return True
 
 
-def update_selected_scopes(scopes: frozenset[str]) -> None:
-    source_paths = get_source_files(scopes)
+def update_selected_scopes(scopes: frozenset[str], platforms: frozenset[str]) -> None:
+    source_paths = get_source_files(scopes, platforms)
     downloaded_files = [(path, fetch_remote_file(str(path))) for path in source_paths]
     updated_count = 0
 
@@ -123,10 +136,12 @@ def update_selected_scopes(scopes: frozenset[str]) -> None:
     print(f"Summary: {updated_count} updated, {current_count} already up to date.")
 
 
-def parse_args(argv: list[str] | None = None) -> frozenset[str]:
+def parse_args(argv: list[str] | None = None) -> tuple[frozenset[str], frozenset[str]]:
     parser = argparse.ArgumentParser(
-        description="Update global OpenCode instructions, agents, and skills from the canonical repository."
+        description="Update global OpenCode and Codex instructions, agents, and skills from the canonical repository."
     )
+    parser.add_argument("--opencode", action="store_true", help="Update only OpenCode content.")
+    parser.add_argument("--codex", action="store_true", help="Update only Codex content.")
     parser.add_argument("--agents-md", action="store_true", help="Update only AGENTS.md.")
     parser.add_argument("--agents", action="store_true", help="Update only global agents.")
     parser.add_argument("--skills", action="store_true", help="Update only global skills.")
@@ -140,12 +155,19 @@ def parse_args(argv: list[str] | None = None) -> frozenset[str]:
     )
     if args.all and selected_scopes:
         parser.error("--all cannot be combined with --agents-md, --agents, or --skills")
-    return ALL_SCOPES if args.all or not selected_scopes else selected_scopes
+
+    selected_platforms = frozenset(
+        platform for platform, selected in ((OPENCODE, args.opencode), (CODEX, args.codex)) if selected
+    )
+    scopes = ALL_SCOPES if args.all or not selected_scopes else selected_scopes
+    platforms = selected_platforms or ALL_PLATFORMS
+    return scopes, platforms
 
 
 def main(argv: list[str] | None = None) -> None:
     try:
-        update_selected_scopes(parse_args(argv))
+        scopes, platforms = parse_args(argv)
+        update_selected_scopes(scopes, platforms)
     except Exception as exc:
         print(f"Error: {exc}", file=sys.stderr)
         raise SystemExit(1) from exc
