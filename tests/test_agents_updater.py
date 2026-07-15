@@ -49,10 +49,9 @@ class UpdateSelectedScopesTests(unittest.TestCase):
     def test_discovers_only_selected_directory_files(self) -> None:
         manifest = {
             "tree": [
-                {"type": "blob", "path": "opencode/agents/tester.md"},
-                {"type": "blob", "path": "opencode/skills/clean-code/SKILL.md"},
-                {"type": "blob", "path": "codex/agents/tester.toml"},
-                {"type": "blob", "path": "codex/skills/clean-code/SKILL.md"},
+                {"type": "blob", "path": "agents/opencode/tester.md"},
+                {"type": "blob", "path": "agents/codex/tester.toml"},
+                {"type": "blob", "path": "content/skills/clean-code/SKILL.md"},
                 {"type": "blob", "path": "README.md"},
             ]
         }
@@ -61,14 +60,31 @@ class UpdateSelectedScopesTests(unittest.TestCase):
                 frozenset((agents_updater.AGENTS,)), frozenset((agents_updater.CODEX,))
             )
 
-        self.assertEqual(paths, [PurePosixPath("codex", "agents", "tester.toml")])
+        self.assertEqual(paths, [PurePosixPath("agents", "codex", "tester.toml")])
+
+    def test_discovers_shared_skills_once(self) -> None:
+        manifest = {
+            "tree": [
+                {"type": "blob", "path": "content/skills/grill-me/SKILL.md"},
+                {"type": "blob", "path": "agents/codex/reviewer.toml"},
+            ]
+        }
+        with patch.object(agents_updater, "fetch_url", return_value=json.dumps(manifest)):
+            paths = agents_updater.fetch_directory_files(
+                frozenset((agents_updater.SKILLS,)), frozenset((agents_updater.CODEX,))
+            )
+
+        self.assertEqual(
+            paths,
+            [PurePosixPath("content", "skills", "grill-me", "SKILL.md")],
+        )
 
     def test_updates_selected_files_in_platform_directories(self) -> None:
         source_paths = [
-            PurePosixPath("opencode", "AGENTS.md"),
-            PurePosixPath("opencode", "skills", "clean-code", "SKILL.md"),
-            PurePosixPath("codex", "AGENTS.md"),
-            PurePosixPath("codex", "agents", "tester.toml"),
+            PurePosixPath("content", "AGENTS.md"),
+            PurePosixPath("content", "skills", "clean-code", "SKILL.md"),
+            PurePosixPath("agents", "opencode", "tester.md"),
+            PurePosixPath("agents", "codex", "tester.toml"),
         ]
 
         with tempfile.TemporaryDirectory() as directory:
@@ -79,7 +95,7 @@ class UpdateSelectedScopesTests(unittest.TestCase):
                 patch.object(
                     agents_updater,
                     "fetch_remote_file",
-                    side_effect=("opencode instructions", "skill", "codex instructions", "agent"),
+                    side_effect=("instructions", "skill", "opencode agent", "codex agent"),
                 ),
                 patch.object(agents_updater, "get_global_opencode_path", return_value=opencode_path),
                 patch.object(agents_updater, "get_global_codex_path", return_value=codex_path),
@@ -88,18 +104,22 @@ class UpdateSelectedScopesTests(unittest.TestCase):
                 with redirect_stdout(output):
                     agents_updater.update_selected_scopes(agents_updater.ALL_SCOPES, agents_updater.ALL_PLATFORMS)
 
-            self.assertEqual((opencode_path / "AGENTS.md").read_text(encoding="utf-8"), "opencode instructions")
+            self.assertEqual((opencode_path / "AGENTS.md").read_text(encoding="utf-8"), "instructions")
             self.assertEqual(
                 (opencode_path / "skills" / "clean-code" / "SKILL.md").read_text(encoding="utf-8"), "skill"
             )
-            self.assertEqual((codex_path / "AGENTS.md").read_text(encoding="utf-8"), "codex instructions")
-            self.assertEqual((codex_path / "agents" / "tester.toml").read_text(encoding="utf-8"), "agent")
-            self.assertIn("Summary: 4 updated, 0 already up to date.", output.getvalue())
+            self.assertEqual((opencode_path / "agents" / "tester.md").read_text(encoding="utf-8"), "opencode agent")
+            self.assertEqual((codex_path / "AGENTS.md").read_text(encoding="utf-8"), "instructions")
+            self.assertEqual(
+                (codex_path / "skills" / "clean-code" / "SKILL.md").read_text(encoding="utf-8"), "skill"
+            )
+            self.assertEqual((codex_path / "agents" / "tester.toml").read_text(encoding="utf-8"), "codex agent")
+            self.assertIn("Summary: 6 updated, 0 already up to date.", output.getvalue())
 
     def test_download_failure_does_not_update_any_file(self) -> None:
         source_paths = [
-            PurePosixPath("opencode", "AGENTS.md"),
-            PurePosixPath("opencode", "agents", "tester.md"),
+            PurePosixPath("content", "AGENTS.md"),
+            PurePosixPath("agents", "opencode", "tester.md"),
         ]
 
         with tempfile.TemporaryDirectory() as directory:

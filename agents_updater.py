@@ -14,6 +14,7 @@ TREE_SOURCE_URL = "https://api.github.com/repos/igorsimb/agents-updater/git/tree
 OPENCODE = "opencode"
 CODEX = "codex"
 ALL_PLATFORMS = frozenset((OPENCODE, CODEX))
+CONTENT_DIRECTORY = "content"
 AGENTS_MD = "agents_md"
 AGENTS = "agents"
 SKILLS = "skills"
@@ -27,6 +28,14 @@ def get_global_opencode_path() -> Path:
 
 def get_global_codex_path() -> Path:
     return Path.home() / ".codex"
+
+
+def get_global_platform_path(platform: str) -> Path:
+    if platform == OPENCODE:
+        return get_global_opencode_path()
+    if platform == CODEX:
+        return get_global_codex_path()
+    raise ValueError(f"invalid platform: {platform}")
 
 
 def fetch_url(url: str, description: str) -> str:
@@ -56,18 +65,20 @@ def fetch_directory_files(scopes: frozenset[str], platforms: frozenset[str]) -> 
     except (json.JSONDecodeError, KeyError, TypeError) as exc:
         raise RuntimeError("failed to read source manifest") from exc
 
+    source_directories = set()
+    if SKILLS in scopes:
+        source_directories.add(PurePosixPath(CONTENT_DIRECTORY, SKILLS))
+    if AGENTS in scopes:
+        source_directories.update(PurePosixPath(AGENTS, platform) for platform in platforms)
+
     paths = []
     for entry in entries:
         if entry.get("type") != "blob":
             continue
 
         path = PurePosixPath(entry["path"])
-        for platform in platforms:
-            for scope in scopes.intersection(DIRECTORY_SCOPES):
-                scope_path = PurePosixPath(platform, scope)
-                if scope_path in path.parents:
-                    paths.append(path)
-                    break
+        if any(source_directory in path.parents for source_directory in source_directories):
+            paths.append(path)
 
     return sorted(paths)
 
@@ -75,23 +86,32 @@ def fetch_directory_files(scopes: frozenset[str], platforms: frozenset[str]) -> 
 def get_source_files(scopes: frozenset[str], platforms: frozenset[str]) -> list[PurePosixPath]:
     paths = []
     if AGENTS_MD in scopes:
-        paths.extend(PurePosixPath(platform, "AGENTS.md") for platform in sorted(platforms))
+        paths.append(PurePosixPath(CONTENT_DIRECTORY, "AGENTS.md"))
     paths.extend(fetch_directory_files(scopes, platforms))
     return paths
 
 
-def get_destination_path(source_path: PurePosixPath) -> Path:
-    platform = source_path.parts[0] if source_path.parts else None
+def get_destination_paths(source_path: PurePosixPath, platforms: frozenset[str]) -> list[Path]:
+    source_root = source_path.parts[0] if source_path.parts else None
+    if source_root == CONTENT_DIRECTORY:
+        try:
+            relative_path = source_path.relative_to(CONTENT_DIRECTORY)
+        except ValueError as exc:
+            raise ValueError(f"invalid source path: {source_path}") from exc
+        return [get_global_platform_path(platform).joinpath(*relative_path.parts) for platform in sorted(platforms)]
+
+    if source_root != AGENTS or len(source_path.parts) < 3:
+        raise ValueError(f"invalid source path: {source_path}")
+
+    platform = source_path.parts[1]
     if platform not in ALL_PLATFORMS:
         raise ValueError(f"invalid source path: {source_path}")
 
     try:
-        relative_path = source_path.relative_to(platform)
+        relative_path = source_path.relative_to(PurePosixPath(AGENTS, platform))
     except ValueError as exc:
         raise ValueError(f"invalid source path: {source_path}") from exc
-
-    global_path = get_global_opencode_path() if platform == OPENCODE else get_global_codex_path()
-    return global_path.joinpath(*relative_path.parts)
+    return [get_global_platform_path(platform).joinpath(AGENTS, *relative_path.parts)]
 
 
 def update_file(local_path: Path, remote_content: str, label: str) -> bool:
@@ -127,12 +147,15 @@ def update_selected_scopes(scopes: frozenset[str], platforms: frozenset[str]) ->
     source_paths = get_source_files(scopes, platforms)
     downloaded_files = [(path, fetch_remote_file(str(path))) for path in source_paths]
     updated_count = 0
+    destination_count = 0
 
     for source_path, content in downloaded_files:
-        if update_file(get_destination_path(source_path), content, str(source_path)):
-            updated_count += 1
+        for destination_path in get_destination_paths(source_path, platforms):
+            destination_count += 1
+            if update_file(destination_path, content, str(source_path)):
+                updated_count += 1
 
-    current_count = len(downloaded_files) - updated_count
+    current_count = destination_count - updated_count
     print(f"Summary: {updated_count} updated, {current_count} already up to date.")
 
 

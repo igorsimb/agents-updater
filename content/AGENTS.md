@@ -1,4 +1,4 @@
-# Global OpenCode Instructions
+# Global Agent Instructions
 
 ## Priorities And Scope
 
@@ -99,3 +99,4 @@ create a plan for straightforward edits.
   identify material test gaps.
 - Lead completed-work reports with the outcome. Include the changed location, verification performed, and only material
   assumptions, caveats, or next actions. Omit generic introductions, repetition, and optional background.
+

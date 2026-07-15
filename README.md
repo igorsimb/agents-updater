@@ -7,25 +7,27 @@ content stored in GitHub.
 
 Run `agents-update` to update all managed OpenCode and Codex content:
 
-- download the canonical `AGENTS.md`
-- download the canonical `agents/` and `skills/` directories
+- download the shared canonical `AGENTS.md` and `skills/` directory
+- download each selected platform's native agents
 - compare each file with its global counterpart
 - create or overwrite files only when content differs
 - preserve global agents and skills that are not managed by this repository
 - print per-file results and a summary
 
-The canonical payload lives in this repository's `opencode/` and `codex/` directories:
+Shared content lives in `content/`. Native agent definitions live under `agents/` by platform:
 
 ```text
-opencode/
+content/
   AGENTS.md
-  agents/
   skills/
-codex/
-  AGENTS.md
-  agents/
-  skills/
+agents/
+  codex/
+  opencode/
 ```
+
+Update `content/AGENTS.md` or a skill under `content/skills/` once. The command writes that shared content to every
+selected platform. Agent definitions stay separate because OpenCode uses Markdown with YAML frontmatter while Codex
+uses TOML.
 
 ## Installation
 
@@ -112,6 +114,29 @@ The update is additive: files managed by this repository are updated, but global
 repository are not deleted.
 
 ## FAQ
+
+### How do I update a skill for all platforms?
+
+Edit the single canonical copy under `content/skills/<skill-name>/`. After publishing the change to the canonical
+repository's `main` branch, run:
+
+```bash
+agents-update --skills
+```
+
+Because no platform flag is provided, the command writes the shared skill to every supported platform.
+
+### How do I update agents for all platforms?
+
+Agents use platform-specific formats, so update each native definition separately. For example, update both
+`agents/opencode/reviewer.md` and `agents/codex/reviewer.toml`. After publishing the changes to the canonical
+repository's `main` branch, run:
+
+```bash
+agents-update --agents
+```
+
+Because no platform flag is provided, the command updates native agents for every supported platform.
 
 ### Can I still have a project-level `AGENTS.md`?
 

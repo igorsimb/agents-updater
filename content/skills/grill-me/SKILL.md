@@ -17,8 +17,8 @@ questions are explicit. Do not implement anything during the interview.
 
 Before asking the first question:
 
-1. Inspect relevant code, configuration, documentation, and tests when they can establish facts about the current system.
-   Use read-only inspection and do not edit files or run mutating commands.
+1. Inspect relevant code, configuration, documentation, and tests when they can establish facts about the current
+   system. Use read-only inspection and do not edit files or run mutating commands.
 2. Separate facts discoverable from the repository from choices that require the user. Do not ask the user to choose
    something the available evidence already answers unless the plan proposes changing it.
 3. Map the unresolved decisions in dependency order. Ask the earliest decision whose answer constrains later decisions.
@@ -85,5 +85,6 @@ End the interview when no material design decision remains unresolved. Provide a
 - failure behavior, edge cases, and validation expectations;
 - explicit assumptions and any non-blocking open questions.
 
-Do not create or modify implementation artifacts. If the user asks to implement during the interview, first confirm that
-the interview is complete or that they want to end it early, then hand off the locked design as the implementation input.
+Do not create or modify implementation artifacts. If the user asks to implement during the interview, first confirm
+that the interview is complete or that they want to end it early, then hand off the locked design as the implementation
+input.

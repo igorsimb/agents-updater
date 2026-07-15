@@ -26,3 +26,4 @@ Lead with findings ordered by severity. For each finding, include:
 If no material findings exist, state that explicitly. Then identify only meaningful testing gaps, assumptions, or
 residual risks. Do not add generic praise, boilerplate checklists, or speculative recommendations.
 """
+
