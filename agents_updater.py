@@ -20,6 +20,7 @@ AGENTS = "agents"
 SKILLS = "skills"
 ALL_SCOPES = frozenset((AGENTS_MD, AGENTS, SKILLS))
 DIRECTORY_SCOPES = frozenset((AGENTS, SKILLS))
+PLATFORM_LABELS = {CODEX: "Codex", OPENCODE: "OpenCode"}
 
 
 def get_global_opencode_path() -> Path:
@@ -91,14 +92,17 @@ def get_source_files(scopes: frozenset[str], platforms: frozenset[str]) -> list[
     return paths
 
 
-def get_destination_paths(source_path: PurePosixPath, platforms: frozenset[str]) -> list[Path]:
+def get_destinations(source_path: PurePosixPath, platforms: frozenset[str]) -> list[tuple[str, Path]]:
     source_root = source_path.parts[0] if source_path.parts else None
     if source_root == CONTENT_DIRECTORY:
         try:
             relative_path = source_path.relative_to(CONTENT_DIRECTORY)
         except ValueError as exc:
             raise ValueError(f"invalid source path: {source_path}") from exc
-        return [get_global_platform_path(platform).joinpath(*relative_path.parts) for platform in sorted(platforms)]
+        return [
+            (platform, get_global_platform_path(platform).joinpath(*relative_path.parts))
+            for platform in sorted(platforms)
+        ]
 
     if source_root != AGENTS or len(source_path.parts) < 3:
         raise ValueError(f"invalid source path: {source_path}")
@@ -111,15 +115,29 @@ def get_destination_paths(source_path: PurePosixPath, platforms: frozenset[str])
         relative_path = source_path.relative_to(PurePosixPath(AGENTS, platform))
     except ValueError as exc:
         raise ValueError(f"invalid source path: {source_path}") from exc
-    return [get_global_platform_path(platform).joinpath(AGENTS, *relative_path.parts)]
+    return [(platform, get_global_platform_path(platform).joinpath(AGENTS, *relative_path.parts))]
 
 
-def update_file(local_path: Path, remote_content: str, label: str) -> bool:
+def get_source_item(source_path: PurePosixPath) -> tuple[str, str]:
+    if source_path == PurePosixPath(CONTENT_DIRECTORY, "AGENTS.md"):
+        return AGENTS_MD, "AGENTS.md"
+
+    if len(source_path.parts) >= 3 and source_path.parts[:2] == (CONTENT_DIRECTORY, SKILLS):
+        return SKILLS, source_path.parts[2]
+
+    if len(source_path.parts) >= 3 and source_path.parts[0] == AGENTS:
+        relative_path = source_path.relative_to(PurePosixPath(AGENTS, source_path.parts[1]))
+        name = relative_path.parts[0]
+        return AGENTS, PurePosixPath(name).stem if len(relative_path.parts) == 1 else name
+
+    raise ValueError(f"invalid source path: {source_path}")
+
+
+def update_file(local_path: Path, remote_content: str) -> bool:
     local_path.parent.mkdir(parents=True, exist_ok=True)
     local_content = local_path.read_text(encoding="utf-8") if local_path.exists() else None
 
     if local_content == remote_content:
-        print(f"{label} already up to date: {local_path}")
         return False
 
     tmp_file = None
@@ -139,24 +157,47 @@ def update_file(local_path: Path, remote_content: str, label: str) -> bool:
         if tmp_file is not None and tmp_file.exists():
             tmp_file.unlink()
 
-    print(f"{label} updated: {local_path}")
     return True
+
+
+def print_update_results(results: dict[str, dict[str, dict[str, bool]]], platforms: frozenset[str]) -> None:
+    updated_count = 0
+    current_count = 0
+
+    for platform in sorted(platforms):
+        print(f"{PLATFORM_LABELS[platform]} -> {get_global_platform_path(platform)}")
+        for scope in (AGENTS_MD, AGENTS, SKILLS):
+            items = results[platform].get(scope, {})
+            for updated in (True, False):
+                names = sorted(name for name, was_updated in items.items() if was_updated == updated)
+                if not names:
+                    continue
+
+                status = "updated" if updated else "current"
+                label = f"{scope}: " if scope != AGENTS_MD else ""
+                print(f"  [{status}] {label}{', '.join(names)}")
+                if updated:
+                    updated_count += len(names)
+                else:
+                    current_count += len(names)
+        print()
+
+    print(f"{updated_count} updated, {current_count} current.")
 
 
 def update_selected_scopes(scopes: frozenset[str], platforms: frozenset[str]) -> None:
     source_paths = get_source_files(scopes, platforms)
     downloaded_files = [(path, fetch_remote_file(str(path))) for path in source_paths]
-    updated_count = 0
-    destination_count = 0
+    results: dict[str, dict[str, dict[str, bool]]] = {platform: {} for platform in platforms}
 
     for source_path, content in downloaded_files:
-        for destination_path in get_destination_paths(source_path, platforms):
-            destination_count += 1
-            if update_file(destination_path, content, str(source_path)):
-                updated_count += 1
+        scope, name = get_source_item(source_path)
+        for platform, destination_path in get_destinations(source_path, platforms):
+            updated = update_file(destination_path, content)
+            scope_results = results[platform].setdefault(scope, {})
+            scope_results[name] = scope_results.get(name, False) or updated
 
-    current_count = destination_count - updated_count
-    print(f"Summary: {updated_count} updated, {current_count} already up to date.")
+    print_update_results(results, platforms)
 
 
 def parse_args(argv: list[str] | None = None) -> tuple[frozenset[str], frozenset[str]]:

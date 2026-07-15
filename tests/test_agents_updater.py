@@ -114,7 +114,62 @@ class UpdateSelectedScopesTests(unittest.TestCase):
                 (codex_path / "skills" / "clean-code" / "SKILL.md").read_text(encoding="utf-8"), "skill"
             )
             self.assertEqual((codex_path / "agents" / "tester.toml").read_text(encoding="utf-8"), "codex agent")
-            self.assertIn("Summary: 6 updated, 0 already up to date.", output.getvalue())
+            self.assertEqual(
+                output.getvalue(),
+                f"""Codex -> {codex_path}
+  [updated] AGENTS.md
+  [updated] agents: tester
+  [updated] skills: clean-code
+
+OpenCode -> {opencode_path}
+  [updated] AGENTS.md
+  [updated] agents: tester
+  [updated] skills: clean-code
+
+6 updated, 0 current.
+""",
+            )
+
+    def test_groups_mixed_statuses_by_logical_item(self) -> None:
+        source_paths = [
+            PurePosixPath("content", "skills", "clean-code", "SKILL.md"),
+            PurePosixPath("content", "skills", "grill-me", "SKILL.md"),
+            PurePosixPath("content", "skills", "grill-me", "references", "questions.md"),
+        ]
+
+        with tempfile.TemporaryDirectory() as directory:
+            codex_path = Path(directory) / "codex"
+            clean_code_path = codex_path / "skills" / "clean-code" / "SKILL.md"
+            grill_me_path = codex_path / "skills" / "grill-me" / "SKILL.md"
+            clean_code_path.parent.mkdir(parents=True)
+            grill_me_path.parent.mkdir(parents=True)
+            clean_code_path.write_text("clean code", encoding="utf-8")
+            grill_me_path.write_text("grill me", encoding="utf-8")
+
+            with (
+                patch.object(agents_updater, "get_source_files", return_value=source_paths),
+                patch.object(
+                    agents_updater,
+                    "fetch_remote_file",
+                    side_effect=("clean code", "grill me", "questions"),
+                ),
+                patch.object(agents_updater, "get_global_codex_path", return_value=codex_path),
+            ):
+                output = io.StringIO()
+                with redirect_stdout(output):
+                    agents_updater.update_selected_scopes(
+                        frozenset((agents_updater.SKILLS,)), frozenset((agents_updater.CODEX,))
+                    )
+
+            self.assertEqual(
+                output.getvalue(),
+                f"""Codex -> {codex_path}
+  [updated] skills: grill-me
+  [current] skills: clean-code
+
+1 updated, 1 current.
+""",
+            )
 
     def test_download_failure_does_not_update_any_file(self) -> None:
         source_paths = [
@@ -146,13 +201,9 @@ class UpdateSelectedScopesTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             local_path = Path(directory) / "AGENTS.md"
             local_path.write_text("instructions", encoding="utf-8")
-            output = io.StringIO()
-
-            with redirect_stdout(output):
-                updated = agents_updater.update_file(local_path, "instructions", "AGENTS.md")
+            updated = agents_updater.update_file(local_path, "instructions")
 
             self.assertFalse(updated)
-            self.assertIn("already up to date", output.getvalue())
 
 
 if __name__ == "__main__":

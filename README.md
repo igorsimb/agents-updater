@@ -12,7 +12,7 @@ Run `agents-update` to update all managed OpenCode and Codex content:
 - compare each file with its global counterpart
 - create or overwrite files only when content differs
 - preserve global agents and skills that are not managed by this repository
-- print per-file results and a summary
+- print grouped per-platform results and a summary
 
 Shared content lives in `content/`. Native agent definitions live under `agents/` by platform:
 
@@ -70,6 +70,24 @@ From anywhere:
 ```bash
 agents-update
 ```
+
+Example output:
+
+```text
+Codex -> C:\Users\you\.codex
+  [updated] AGENTS.md
+  [updated] agents: docs-writer, reviewer, tester
+  [updated] skills: clean-code, grill-me, langchain-docs
+
+OpenCode -> C:\Users\you\.config\opencode
+  [updated] AGENTS.md
+  [updated] agents: docs-writer, reviewer, tester
+  [updated] skills: clean-code, grill-me, langchain-docs
+
+14 updated, 0 current.
+```
+
+A skill or agent is reported as updated when at least one managed file inside it changed.
 
 The command updates all of the following by default:
 

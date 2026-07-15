@@ -1,6 +1,6 @@
 [project]
 name = "agents-updater"
-version = "0.3.0"
+version = "0.4.0"
 description = "CLI tool to update global OpenCode and Codex instructions, agents, and skills"
 license = "MIT"
 readme = "README.md"
