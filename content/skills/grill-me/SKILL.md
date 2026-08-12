@@ -75,6 +75,21 @@ After each answer:
 Distinguish user choices from discovered constraints in the running record. Treat code as evidence of current behavior,
 not as authority over the user's intended behavior.
 
+## Coordinate With Domain Modeling
+
+When `domain-modeling` is active with this skill, keep its semantic work active throughout the interview: challenge
+terms, sharpen vocabulary, test concrete scenarios, cross-reference code, and include each settled domain term or
+decision in the visible locked-decision record.
+
+The interview's read-only boundary governs persistence only. Queue settled glossary and ADR updates instead of editing
+files while questions remain. Do not let deferred persistence postpone domain questions or allow terminology to remain
+vague.
+
+After the stop condition is reached, explicitly close the interview, then let `domain-modeling` persist the queued
+updates before handing off the final design. Glossary and ADR files are design records, not implementation artifacts.
+If the interview ends early, include the queued updates in the handoff and persist only decisions that are already
+settled.
+
 ## Stop Condition
 
 End the interview when no material design decision remains unresolved. Provide a final design brief containing:

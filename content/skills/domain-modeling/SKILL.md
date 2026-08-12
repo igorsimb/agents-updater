@@ -66,6 +66,13 @@ When the user states how something works, check whether the code agrees. If you 
 When a term is resolved, update `GLOSSARY.md` right there. Don't batch these up — capture them as they happen. Use the 
 format in [GLOSSARY-FORMAT.md](GLOSSARY-FORMAT.md).
 
+When this skill is active with `grill-me`, its interview boundary takes precedence over the timing of file writes, not
+over domain-modeling work. Continue challenging terms, testing scenarios, checking code, and recording every settled
+term or decision in `grill-me`'s visible locked-decision record. Queue the corresponding glossary or ADR update while
+questions remain. As soon as `grill-me` reaches its stop condition and explicitly closes the interview, persist all
+settled queued updates before the final handoff. Do not persist unresolved candidates, and do not treat the deferred
+write as permission to defer domain clarification.
+
 `GLOSSARY.md` should be totally devoid of implementation details. Do not treat `GLOSSARY.md` as a spec, a scratch pad, 
 or a 
 repository for implementation decisions. It is a glossary and nothing else.
