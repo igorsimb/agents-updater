@@ -95,8 +95,9 @@ create a plan for straightforward edits.
 - Do not commit, amend, push, or create pull requests unless explicitly asked.
 - When asked for a commit message, use Conventional Commits with a concise imperative subject and a brief body
   explaining the change and why.
-- After completing a task that changes repository files, always provide a suggested Conventional Commit message in the
-  final response, even when the user did not ask for one.
+- After completing a task that changed repository files, include a suggested Conventional Commit message in the final
+  response, even when the user did not ask for one. For phased work, omit commit messages from intermediate phases and
+  provide one message covering the entire task only after the final phase is complete.
 - For reviews, lead with findings ordered by severity and file reference. State if no findings were discovered and
   identify material test gaps.
 - Lead completed-work reports with the outcome. Include the changed location, verification performed, and only material
