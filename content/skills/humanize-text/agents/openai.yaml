@@ -1,0 +1,7 @@
+interface:
+  display_name: "Humanize Text"
+  short_description: "Make technical prose sound more natural"
+  default_prompt: "Use $humanize-text to improve this completed technical prose without changing its meaning or voice."
+
+policy:
+  allow_implicit_invocation: false
