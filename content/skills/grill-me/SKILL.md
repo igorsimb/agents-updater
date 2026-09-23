@@ -2,7 +2,6 @@
 name: grill-me
 description: Conduct a user-invoked, decision-by-decision interview that turns an incomplete plan into an
   implementation-ready design without implementing it.
-disable-model-invocation: true
 ---
 
 # Grill Me

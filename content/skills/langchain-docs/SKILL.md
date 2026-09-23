@@ -1,17 +1,13 @@
 ---
 name: langchain-docs
-description: Looking up LangChain documentation whenever writing LangChain code.
+description: Consult current official LangChain documentation when writing or debugging LangChain code.
 ---
 
-# Writing Up To Date LangChain Code
+# LangChain Docs
 
-### How to User LangChain Docs
+When a task uses LangChain, check the current documentation before relying on memory because its APIs change frequently.
+Use the official documentation at https://docs.langchain.com/oss/python/langchain/overview and follow the version and
+interfaces supported by the project.
 
-This page is where the LangChain docs are located: https://docs.langchain.com/oss/python/langchain/overview
-
-Whenever a user asks you to write something using LangChain, check the latest docs first. Never ever try to just code
-from memory. LangChain changes its API very often. Code from one month ago might already be outdated. So always rely on
-the docs. Check how the thing you are trying to do is done in the latest docs. Today.
-
-For this use a maximum of 5 web searches and/or fetches. Not more. Then get to coding. And make sure to trust the docs
-instead of what you think.
+Look up only the APIs relevant to the task, then implement and verify the requested behavior. If the documentation and
+repository disagree, report the mismatch and follow the user's requested compatibility target.

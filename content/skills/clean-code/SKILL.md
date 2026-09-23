@@ -1,43 +1,38 @@
 ---
 name: clean-code
-description: Use when refactoring, reviewing, or improving code quality. Focus on clear, maintainable code without
-  changing required behavior.
+description: Improve existing code when a concrete readability, maintainability, or design problem is in scope.
 ---
 
 # Clean Code
 
-Use this skill to resolve concrete readability, maintainability, or design problems in existing code. Preserve required
-behavior and follow the repository's established conventions.
+Use this skill for a focused refactor or code-quality review. Preserve required behavior, public interfaces, and the
+repository's established conventions.
 
 ## Approach
 
-- Inspect the relevant code and tests before proposing or making a change.
-- Make the smallest change that resolves the identified problem. Do not refactor adjacent code without a concrete
-  benefit.
-- Prefer clear names, straightforward control flow, and local code over cleverness or speculative abstractions.
-- Preserve the existing public API unless the task explicitly changes it.
+- Inspect the affected implementation and nearby tests before editing. Read more only when the result depends on it.
+- Make the smallest change that resolves the concrete problem. Do not refactor adjacent code without a present benefit.
+- Prefer clear names, straightforward control flow, local code, and explicit side effects over cleverness or speculative
+  abstractions.
 - Treat principles as heuristics, not quotas. Avoid arbitrary limits on lines, parameters, functions, or classes.
 
-## Code Quality Heuristics
+## Code quality
 
+- Keep each function or class focused on one coherent responsibility and keep related behavior together.
+- Extract a helper when it removes real duplication or clarifies a meaningful concept. Keep abstractions at a consistent
+  level and do not introduce interfaces or layers without a present need.
 - Choose names that reveal purpose and distinguish concepts clearly.
-- Keep each function or class focused on one coherent responsibility.
-- Keep related behavior together; extract a helper only when it removes real duplication or clarifies a meaningful
-  concept.
-- Keep abstractions at a consistent level. Do not introduce interfaces, patterns, or layers without a present need.
-- Avoid hidden side effects. Make state changes, mutation, and I/O apparent at the appropriate boundary.
-- Prefer explicit error handling with useful context over error codes, broad catches, or silent failures.
-- Use comments for non-obvious intent, constraints, or tradeoffs. Improve code instead of commenting on obvious
+- Make mutation, state changes, and I/O apparent at the appropriate boundary. Avoid hidden side effects.
+- Handle realistic failures with precise exceptions and useful context rather than broad catches, error codes, or silent
+  failures.
+- Use comments for non-obvious intent, constraints, or trade-offs. Improve the code instead of commenting on obvious
   mechanics.
 
 ## Verification
 
-- Test the main observable behavior and changed edge cases, not implementation details or incidental formatting.
-- Preserve and extend focused regression coverage when it directly protects the change.
-- Run the narrowest relevant verification and report material gaps.
+Test the main observable behavior and changed edge cases, not implementation details or incidental formatting. Preserve
+or extend focused regression coverage when it directly protects the change. Run the narrowest useful verification,
+broaden it when risk warrants it, and report material gaps.
 
-## Review Output
-
-Lead with the most important finding or completed improvement. Include the evidence needed to support it, material
-caveats, and the next action. Omit generic introductions, repeated guidance, and optional background.
-
+For reviews, lead with the highest-impact evidence-based finding. Separate concrete correctness, compatibility, security,
+performance, or maintenance risks from style preferences.

@@ -1,7 +1,6 @@
 ---
 name: humanize-text
-description: User-invoked only. Polish completed technical prose that sounds mechanically generated while preserving
-  technical meaning and the author's voice.
+description: User-invoked final edit for technical prose that sounds mechanical, while preserving meaning and voice.
 ---
 
 # Humanize Text
@@ -12,15 +11,13 @@ Preserve the author's meaning, facts, caveats, numbers, terminology, degree of c
 Do not draft new material, broadly restructure the piece, add examples or opinions, or make the writing more literary,
 casual, corporate, or polished.
 
-## Workflow
+## Approach
 
-1. Read the complete source before editing. Identify its intended tone and the technical terms that must remain stable.
-2. Scan for the patterns below. Treat them as diagnostic signals, not automatic errors or banned words.
-3. Make the smallest revisions that improve clarity and cadence.
-4. Compare the revision with the source. Restore anything that changes a fact, qualification, number, attribution,
-   technical term, or degree of certainty.
-5. Read the revision once for natural rhythm. Fix remaining mechanical patterns without smoothing away the author's
-   voice.
+Read the complete source to understand its tone and stable technical terms. Make the smallest revisions that improve
+clarity and cadence. Treat the patterns below as diagnostic signals, not automatic errors or banned words.
+
+For examples of abstract phrasing, sentence rhythm, contrasts, or metaphors, consult
+[editing examples](references/editing-examples.md) when the intended transformation is unclear.
 
 ## Editing Focus
 
@@ -65,59 +62,8 @@ casual, corporate, or polished.
 - Do not rewrite whole paragraphs merely to vary rhythm.
 - Do not make prose vague, casual, or theatrical in the name of sounding human.
 - Do not replace simple wording with clever wording.
-- Do not treat individual words, punctuation, passive voice, or sentence length as proof that prose is mechanical.
-
-## Examples
-
-These examples isolate linguistic transformations. Assume every concrete detail in a revision is supported elsewhere
-in the source. Copy the transformation pattern, not the facts. Never infer a mechanism, metric, or event from an
-abstract sentence or metaphor alone.
-
-Abstract:
-
-> The change improved efficiency and reduced complexity.
-
-Concrete:
-
-> The change removed an extra model hop and sent less prompt context on simple turns.
-
-Noun-heavy:
-
-> The implementation of routing logic enabled optimization of lightweight requests.
-
-Direct:
-
-> The routing logic made lightweight requests cheaper.
-
-Overly balanced:
-
-> The app kept one shared runtime, preserved conversation history, and maintained the existing safety checks.
-
-More natural:
-
-> The app still used one shared runtime and kept the same conversation history. The safety checks stayed where they were.
-
-Formulaic contrast:
-
-> This is not a routing problem, it is a prompt-selection problem.
-
-Direct:
-
-> The router works. The prompt selector chooses the wrong prompt.
-
-Decorative comparison:
-
-> That felt like securing the front door and leaving the window open.
-
-Concrete:
-
-> The endpoint required authentication, but the debug route remained public.
 
 ## Final Check
 
-Scan the revised prose for empty framing, formulaic contrasts, unsupported intensifiers, superficial participial tails,
-synonym cycling, false ranges, stacked hedges, vague comparisons, generic conclusions, repetitive cadence, and em
-dashes. Remove or rewrite them under the rules above.
-
-Then compare the source and revision once more. The result must retain the same technical meaning, evidence,
-uncertainty, and authorial voice. If natural cadence conflicts with technical precision, keep the precision.
+Compare the revision with the source for meaning, facts, numbers, qualifications, attribution, terminology, and certainty.
+Check its rhythm without smoothing away the author's voice. Technical precision takes priority over natural cadence.
