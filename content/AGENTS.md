@@ -43,5 +43,7 @@ These instructions are the shared baseline for work in projects that install thi
 
 - Do not commit, amend, push, or create pull requests unless explicitly asked.
 - Report the outcome, changed locations, verification performed, and material gaps or assumptions.
-- When the user asks for a commit message after the requested work is complete, use a concise Conventional Commit
-  subject and explain the change briefly.
+- When the user asks for a commit message after the requested work is complete, use a Conventional Commit
+  subject and body and explain the change briefly. Automatically suggest a Conventional Commit message only when the 
+  entire user-requested task is complete and the task changed repository files. If any planned phase or required
+  work remains, omit the commit message from intermediate responses, even when the current phase changed files.
