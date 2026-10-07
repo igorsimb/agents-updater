@@ -27,6 +27,17 @@ These instructions are the shared baseline for work in projects that install thi
 - Keep new or changed lines near 120 characters and do not reflow unrelated text.
 - Use regular hyphens (`-`), never em dashes.
 - In Python, prefer clear control flow, precise exceptions, and PEP 604 unions where the project uses annotations.
+- Write Python module-level docstrings for readers unfamiliar with the file. Start with a plain-language sentence
+  explaining what the module does and why it exists. When useful, follow with a short paragraph explaining its
+  responsibilities and how it fits into the surrounding workflow.
+- Prefer concrete verbs and familiar language over compressed technical labels in module docstrings. For example,
+  prefer "Collect supplier names for the brand/article pairs in a production run." over "Fixed canonical evidence
+  query with one HTTP attempt and production-only bounds."
+- Include module boundaries or constraints only when they help readers understand the module. Keep simple modules
+  brief; add detail when responsibilities warrant it. Do not repeat imports, list every function, restate obvious
+  code, or include temporary implementation-phase notes. Keep docstrings accurate when behavior changes.
+- Apply this docstring convention to new Python modules and modules substantially changed during a task. Do not
+  rewrite unrelated files solely to add docstrings.
 - In frontend work, follow existing components and theme-aware utility classes. Keep user-facing UI text in Russian
   unless the request specifies another language.
 - In Django work, keep settings and routes in their established modules, read secrets from the environment, and keep
