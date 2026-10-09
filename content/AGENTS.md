@@ -17,6 +17,8 @@ These instructions are the shared baseline for work in projects that install thi
   relevant; do not load the whole repository by default.
 - Make the smallest coherent change that satisfies the request and preserves unrelated behavior.
 - Prefer existing patterns and dependencies. Add structure or dependencies only when the task needs them.
+- Keep business rules close to the code that owns them, make dependencies and side effects explicit, and choose
+  structures that make expected changes easy to understand and test.
 - Use judgment about verification. Run the narrowest useful check, broaden it when the change warrants it, and fix
   relevant failures before handing off. Do not repeat checks that add no confidence.
 - Keep comments for non-obvious intent, constraints, or trade-offs. Do not add comments that restate the code.
