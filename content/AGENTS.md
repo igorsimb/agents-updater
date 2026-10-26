@@ -29,6 +29,9 @@ These instructions are the shared baseline for work in projects that install thi
 - Keep new or changed lines near 120 characters and do not reflow unrelated text.
 - Use regular hyphens (`-`), never em dashes.
 - In Python, prefer clear control flow, precise exceptions, and PEP 604 unions where the project uses annotations.
+- For closed sets of domain values reused across logic or interfaces, prefer named enums over repeated string literals.
+  In Python, use `StrEnum` when values are serialized as strings, with explicit stable values. Use `Literal` for small,
+  local annotation-only choices. Keep these values defined in one place and validate external input at the boundary.
 - Write Python module-level docstrings for readers unfamiliar with the file. Start with a plain-language sentence
   explaining what the module does and why it exists. When useful, follow with a short paragraph explaining its
   responsibilities and how it fits into the surrounding workflow.
@@ -57,6 +60,6 @@ These instructions are the shared baseline for work in projects that install thi
 - Do not commit, amend, push, or create pull requests unless explicitly asked.
 - Report the outcome, changed locations, verification performed, and material gaps or assumptions.
 - When the user asks for a commit message after the requested work is complete, use a Conventional Commit
-  subject and body and explain the change briefly. Automatically suggest a Conventional Commit message only when the 
+  subject and body and explain the change briefly. Automatically suggest a Conventional Commit message only when the
   entire user-requested task is complete and the task changed repository files. If any planned phase or required
   work remains, omit the commit message from intermediate responses, even when the current phase changed files.
